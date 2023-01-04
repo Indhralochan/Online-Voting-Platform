@@ -1,0 +1,23 @@
+{
+  "name": "votingsystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Indhralochan/Online-Voting-Platform.git"
+  },
+  "author": "Indhralochan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Indhralochan/Online-Voting-Platform/issues"
+  },
+  "homepage": "https://github.com/Indhralochan/Online-Voting-Platform#readme",
+  "dependencies": {
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4"
+  }
+}
