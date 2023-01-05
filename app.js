@@ -2,7 +2,11 @@ const express = require("express");
 const app = express();
 const csrf = require("tiny-csrf");
 const cookieParser = require("cookie-parser");
-const { AdminCreate } = require("./models");
+const { AdminCreate,
+        election,
+        options,
+        question,
+        voter } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 const bcrypt = require("bcrypt");
@@ -87,10 +91,30 @@ app.get("/", (request, response) => {
 app.get(
   "/election",
   connectEnsureLogin.ensureLoggedIn(),
-  (request, response) => {
-    response.render("election", {
-      title: "Online Voting Platform",
-    });
+  async (request, response) => {
+    if (request.user.role === "admin") {
+      let username = request.user.firstName +" "+ request.user.lastName;
+      try {
+        const elections = await election.getElections(request.user.id);
+        if (request.accepts("html")) {
+          response.render("election", {
+            title: "Online Voting Platform",
+            username,
+            elections,
+            csrfToken: request.csrfToken(),
+          });
+        } else {
+          return response.json({
+            elections,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    } else if (request.user.role === "voter") {
+      return response.redirect("/");
+    }
   }
 );
 
@@ -192,7 +216,7 @@ app.post("/admin", async (request, response) => {
         response.redirect("/election");
       }
     });
-  } catch (error) {
+  } catch (error){
     request.flash("error", error.message);
     return response.redirect("/signup");
   }
