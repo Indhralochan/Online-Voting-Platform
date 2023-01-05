@@ -41,7 +41,7 @@ passport.use(
       passwordField: "password",
     },
     (username, password, done) => {
-      Admin.findOne({ where: { email: username } })
+      AdminCreate.findOne({ where: { email: username } })
         .then(async (user) => {
           const val = await bcrypt.compare(password, user.password);
           if (val) {
@@ -61,7 +61,7 @@ passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 passport.deserializeUser((id, done) => {
-  Admin.findByPk(id)
+  AdminCreate.findByPk(id)
     .then((user) => {
       done(null, user);
     })
@@ -96,7 +96,7 @@ app.get(
 
 app.get("/signup", (request, response) => {
   response.render("signup", {
-    title: "AdminCreate a new account",
+    title: "Admin Create a new account",
     csrfToken: request.csrfToken(),
   });
 });
@@ -164,7 +164,7 @@ app.post(
       request.user.password
     );
     if (val) {
-      Admin.findOne({ where: { email: request.user.email } }).then((user) => {
+      AdminCreate.findOne({ where: { email: request.user.email } }).then((user) => {
         user.resetPass(newPassword);
       });
       request.flash("success", "Password changed successfully");
