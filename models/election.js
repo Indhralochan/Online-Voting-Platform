@@ -24,11 +24,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "electionID",
       });
     }
-    static addElection({ elecName, id, cstmUrl }) {
+    static addElection({ elecName, adminID, cstmUrl }) {
       return this.create({
         elecName,
         cstmUrl,
-        id,
+        adminID,
       });
     }
     static async getElections(id){

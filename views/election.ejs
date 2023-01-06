@@ -24,22 +24,22 @@
             <% } %>
         </div>
         <div class="flex gap-2 py-4 justify-center">
-            <h5 class="text-2xl">Your Elections</h5>
+            <h5 class="text-2xl">Your elections</h5>
         </div>
-        <div class="flex-auto">
+        <div class="text-center">
             <div class="mx-4">  
-                <p class="text-orange-400 mx-auto text-center"><%= (election.length==0)?"You have not created any elections yet":"" %></p>
-                <ol class="list">
-                    <% for (let i=0; i<election.length; i++) { %>
-                        <li>
-                            <div class="flex items-center w-fit my-2 px-2 py-1 rounded">
-                                <a href="/election/<%= election[i].id %>" class="m-2 text-sm text-orange-400 "><%= election[i].elecName %></a>
+                <p class="text-orange-400 mx-auto text-center"><%= (elections.length==0)?"You have not created any electionss yet":"" %></p>
+                <ol class="justify-center mx-auto text-center">
+                    <% for (let i=0; i<elections.length; i++) { %>
+                        <li class="text-center justify-center">
+                            <div class="flex items-center w-fit my-2 px-2 py-1 rounded ">
+                                <a href="/election/<%= elections[i].id %>" class="text-white bg-orange-400 text-center rounded w-fit px-2 py-1 hover:bg-green-600 justify-center mx-auto text-center"><%= i+1 %>.<%= elections[i].elecName %></a>
                             </div>
                         </li>
                     <% } %>
                 </ol>
                 <div class="bg-orange-400 text-center rounded w-fit px-2 py-1 hover:bg-green-600 justify-center mx-auto text-center">
-                    <a href="/election/createNew" class="text-white">+ Create a new election</a>
+                    <a href="/election/createNew" class="text-white">+ Create a new elections</a>
                 </div>
             </div>
             </div>

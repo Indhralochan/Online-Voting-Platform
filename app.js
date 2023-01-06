@@ -6,7 +6,8 @@ const { AdminCreate,
         election,
         options,
         question,
-        voter } = require("./models");
+        voter,
+      answers } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 const bcrypt = require("bcrypt");
@@ -99,7 +100,7 @@ app.get(
           response.render("election", {
             title: "Online Voting Platform",
             username,
-            election,
+            elections,
             csrfToken: request.csrfToken(),
           });
         } else {
@@ -256,16 +257,56 @@ app.post(
         return response.redirect("/election/createNew");
       }
       try {
+        console.log("asdfads");
+        console.log(request.body.elecName);
+        console.log(request.body.cstmUrl);
+        console.log(request.user.id);
         await election.addElection({
           elecName: request.body.elecName,
           cstmUrl: request.body.cstmUrl,
-          id: request.user.id,
+          adminID: request.user.id,
         });
+        console.log("bbbbbbbb");
         return response.redirect("/election");
-      } catch (error) {
+        console.log("heffffff");
+      } 
+      catch (error) {
+        console.log(error);
         request.flash("error", "Election URL is already in use");
         return response.redirect("/election/createNew");
       }
   }
+);
+app.get(
+  "/elections/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const election = await election.getElection(request.params.id);
+        if (request.user.id !== election.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/elections");
+        }
+        if (election.ended) {
+          return response.redirect(`/elections/${election.id}/results`);
+        }
+        const numberOfQuestions = await Questions.getNumberOfQuestions(
+          request.params.id
+        );
+        const numberOfVoters = await voter.getNumberOfVoters(request.params.id);
+        return response.render("Question", {
+          id: request.params.id,
+          title: election.elecName,
+          cstmUrl: election.cstmUrl,
+          Running: election.Running,
+          elecQuestion: numberOfQuestions,
+          elecDescription: numberOfVoters,
+          csrfToken: request.csrfToken(),
+        });
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
 );
 module.exports = app;
