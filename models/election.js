@@ -24,6 +24,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "electionID",
       });
     }
+    static addElection({ elecName, id, cstmUrl }) {
+      return this.create({
+        elecName,
+        cstmUrl,
+        id,
+      });
+    }
     static async getElections(id){
       return this.findAll({
         where:{

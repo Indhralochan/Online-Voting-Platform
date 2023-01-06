@@ -92,8 +92,6 @@ app.get(
   "/election",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    console.log("asdlsdfsdf");
-  
       let username = request.user.firstName +" "+ request.user.lastName;
       try {
         const elections = await election.getElections(request.user.id);
@@ -101,7 +99,7 @@ app.get(
           response.render("election", {
             title: "Online Voting Platform",
             username,
-            elections,
+            election,
             csrfToken: request.csrfToken(),
           });
         } else {
@@ -225,5 +223,49 @@ app.post("/admin", async (request, response) => {
     return response.redirect("/signup");
   }
 });
-
+app.get(
+  "/election/createNew",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    response.render("NewElection", {
+      title: "New Election",
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+app.post(
+  "/election",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    function whiteSpaces(value) {
+      return value.indexOf(" ") >= 0;
+    }
+      if (request.body.elecName.length < 5) {
+        request.flash("error", "Election name length should be a minimum of 5");
+        return response.redirect("/election/createNew");
+      }
+      if (request.body.cstmUrl.length < 5) {
+        request.flash("error", "URL String length should be a minimum of 5");
+        return response.redirect("/election/createNew");
+      }
+      const strUrl = request.body.cstmUrl
+      const isWhiteScape = whiteSpaces(strUrl)
+      if(isWhiteScape == true){
+        request.flash("error","Don't enter any white spaces");
+        console.log("Spaces found");
+        return response.redirect("/election/createNew");
+      }
+      try {
+        await election.addElection({
+          elecName: request.body.elecName,
+          cstmUrl: request.body.cstmUrl,
+          id: request.user.id,
+        });
+        return response.redirect("/election");
+      } catch (error) {
+        request.flash("error", "Election URL is already in use");
+        return response.redirect("/election/createNew");
+      }
+  }
+);
 module.exports = app;
