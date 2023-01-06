@@ -31,12 +31,12 @@
         </div>
         <div class="flex-auto">
             <div class="mx-4">  
-                <p class="text-purple-600"><%= (election.length==0)?"You haven't created any elections yet!":"" %></p>
+                <p class="text-purple-600"><%= (elections.length==0)?"You haven't created any elections yet!":"" %></p>
                 <ol class="list-decimal">
-                    <% for (let i=0; i<election.length; i++) { %>
+                    <% for (let i=0; i<elections.length; i++) { %>
                         <li>
                             <div class="flex items-center w-fit my-2 px-2 py-1 rounded hover:bg-purple-50">
-                                <a href="/election/<%= election[i].id %>" class="m-2 text-sm text-purple-600 "><%= election[i].elecName %></a>
+                                <a href="/election/<%= elections[i].id %>" class="m-2 text-sm text-purple-600 "><%= elections[i].elecName %></a>
                             </div>
                         </li>
                     <% } %>

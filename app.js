@@ -92,7 +92,8 @@ app.get(
   "/election",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    if (request.user.role === "admin") {
+    console.log("asdlsdfsdf");
+  
       let username = request.user.firstName +" "+ request.user.lastName;
       try {
         const elections = await election.getElections(request.user.id);
@@ -112,13 +113,12 @@ app.get(
         console.log(error);
         return response.status(422).json(error);
       }
-    } else if (request.user.role === "voter") {
-      return response.redirect("/");
-    }
-  }
+    } 
+  
 );
 
 app.get("/signup", (request, response) => {
+  console.log(request.csrfToken())
   response.render("signup", {
     title: "Admin Create a new account",
     csrfToken: request.csrfToken(),
@@ -208,12 +208,16 @@ app.post("/admin", async (request, response) => {
       lastName: request.body.lastName,
       email: request.body.email,
       password: Pwd,
+    
     });
+    console.log("hgfgfdjgdjthgfjhg");
     request.login(admin, (err) => {
       if (err) {
-        response.redirect("/");
+        console.log("zqwwwwwwwwwwwwwwwq");
+        return response.redirect("/");
       } else {
-        response.redirect("/election");
+        return response.redirect("/election");
+        console.log("zqqqqqqqqqqqqqqq");
       }
     });
   } catch (error){
