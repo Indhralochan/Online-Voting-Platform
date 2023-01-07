@@ -298,17 +298,17 @@ app.get(
   async (request, response) => {
       try {
         const thiselection = await election.getElection(request.params.id);
-        if (request.user.id !== thiselection.adminID) {
+        if (request.user.id!==thiselection.adminID) {
           request.flash("error", "Invalid election ID");
           return response.redirect("/elections");
         }
-        const thisquestions = await question.gtQuestn(request.params.id);
-        if (!thiselection.running && !thiselection.ended) {
+        const thisquestions = await question.gtQuestns(request.params.id);
+        if (!thiselection.Running && !thiselection.Ended) {
           if (request.accepts("html")) {
             return response.render("questions", {
               title: thiselection.elecName,
               id: request.params.id,
-              Questions: thisquestions,
+              thisquestions: thisquestions,
               csrfToken: request.csrfToken(),
             });
           } else {
@@ -340,18 +340,17 @@ app.post(
           `/election/${request.params.id}/questions/create`
         );
       }
-
       try {
         const thiselection = await election.getElection(request.params.id);
         if (request.user.id !== thiselection.adminID) {
           request.flash("error", "Invalid election ID");
           return response.redirect("/election");
         }
-        if (thiselection.running) {
+        if (thiselection.Running) {
           request.flash("error", "Can't the question edit while election is running");
           return response.redirect(`/election/${request.params.id}/`);
         }
-        if (thiselection.ended) {
+        if (thiselection.Ended) {
           request.flash("error", "Cannot edit when election has ended");
           return response.redirect(`/election/${request.params.id}/`);
         }
@@ -380,13 +379,14 @@ app.get(
           request.flash("error", "Invalid election ID");
           return response.redirect("/election");
         }
-        if (!thiselection.running) {
-          return response.render("questions", {
+        if (!thiselection.Running) {
+          return response.render("NewQuestion", {
             id: request.params.id,
+            title:thiselection.elecName,
             csrfToken: request.csrfToken(),
           });
         } else {
-          if (thiselection.ended) {
+          if (thiselection.Ended) {
             request.flash("error", "Cannot edit when election has ended");
             return response.redirect(`/election/${request.params.id}/`);
           }
@@ -404,25 +404,25 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
       try {
-        const thisquestion = await question.getQuestion(request.params.questionID);
-        const thisoptions = await options.getOptions(request.params.questionID);
+        const thisquestion = await question.gtQuestns(request.params.questionID);
+        const thisoptions = await options.gtOptns(request.params.questionID);
         const thiselection = await election.getElection(request.params.id);
         if (request.user.id !== thiselection.adminID) {
           request.flash("error", "Invalid election ID");
           return response.redirect("/elections");
         }
-        if (thiselection.running) {
+        if (thiselection.Running) {
           request.flash("error", "Cannot edit while election is running");
           return response.redirect(`/elections/${request.params.id}/`);
         }
-        if (thiselection.ended) {
+        if (thiselection.Ended) {
           request.flash("error", "Cannot edit when election has ended");
           return response.redirect(`/elections/${request.params.id}/`);
         }
         if (request.accepts("html")) {
-          response.render("question_page", {
-            title: question.question,
-            description: question.description,
+          response.render("questionPage", {
+            title: thisquestion.question,
+            description: thisquestion.description,
             id: request.params.id,
             questionID: request.params.questionID,
             thisoptions,
