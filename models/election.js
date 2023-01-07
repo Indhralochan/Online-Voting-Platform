@@ -31,8 +31,15 @@ module.exports = (sequelize, DataTypes) => {
         adminID,
       });
     }
-    static async getElections(id){
+    static async getElections(adminID){
       return this.findAll({
+        where:{
+          adminID,
+        }
+      })
+    }
+    static async getElection(id){
+      return this.findOne({
         where:{
           id,
         }

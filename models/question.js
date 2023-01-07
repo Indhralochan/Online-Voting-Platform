@@ -21,6 +21,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "questionID",
       });
     }
+    static async getNumberOfQuestions(electionID) {
+      return await this.count({
+        where: {
+          electionID,
+        },
+      });
+    }
   }
   question.init({
     elecQuestion: DataTypes.STRING,
