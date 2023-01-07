@@ -10,7 +10,7 @@ const { AdminCreate,
       answers } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "/public")));
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const connectEnsureLogin = require("connect-ensure-login");
@@ -293,22 +293,22 @@ app.get(
     }
 );
 app.get(
-  "/elections/:id/questions",
+  "/election/:id/questions",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
       try {
-        const elections = await Election.getElection(request.params.id);
-        if (request.user.id !== elections.adminID) {
+        const thiselection = await election.getElection(request.params.id);
+        if (request.user.id !== thiselection.adminID) {
           request.flash("error", "Invalid election ID");
           return response.redirect("/elections");
         }
-        const questions = await Questions.getQuestions(request.params.id);
-        if (!elections.running && !elections.ended) {
+        const thisquestions = await question.gtQuestn(request.params.id);
+        if (!thiselection.running && !thiselection.ended) {
           if (request.accepts("html")) {
             return response.render("questions", {
-              title: elections.electionName,
+              title: thiselection.elecName,
               id: request.params.id,
-              questions: questions,
+              Questions: thisquestions,
               csrfToken: request.csrfToken(),
             });
           } else {
@@ -317,12 +317,121 @@ app.get(
             });
           }
         } else {
-          if (elections.ended) {
+          if (thiselection.ended) {
             request.flash("error", "Cannot edit when election has ended");
-          } else if (elections.running) {
+          } else if (thiselection.running) {
             request.flash("error", "Cannot edit while election is running");
           }
           return response.redirect(`/election/${request.params.id}/`);
+        }
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+app.post(
+  "/election/:id/questions/create",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      if (request.body.question.length < 5) {
+        request.flash("error", "Question length should be atleast 5");
+        return response.redirect(
+          `/election/${request.params.id}/questions/create`
+        );
+      }
+
+      try {
+        const thiselection = await election.getElection(request.params.id);
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        if (thiselection.running) {
+          request.flash("error", "Can't the question edit while election is running");
+          return response.redirect(`/election/${request.params.id}/`);
+        }
+        if (thiselection.ended) {
+          request.flash("error", "Cannot edit when election has ended");
+          return response.redirect(`/election/${request.params.id}/`);
+        }
+        const thisquestion = await question.addQuestions({
+          elecQuestion: request.body.question,
+          elecDescription: request.body.description,
+          electionID: request.params.id,
+        });
+        return response.redirect(
+          `/election/${request.params.id}/questions/${thisquestion.id}`
+        );
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+
+app.get(
+  "/election/:id/questions/create",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const thiselection = await election.getElection(request.params.id);
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        if (!thiselection.running) {
+          return response.render("questions", {
+            id: request.params.id,
+            csrfToken: request.csrfToken(),
+          });
+        } else {
+          if (thiselection.ended) {
+            request.flash("error", "Cannot edit when election has ended");
+            return response.redirect(`/election/${request.params.id}/`);
+          }
+          request.flash("error", "Cannot edit while election is running");
+          return response.redirect(`/election/${request.params.id}/`);
+        }
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+app.get(
+  "/election/:id/questions/:questionID",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const thisquestion = await question.getQuestion(request.params.questionID);
+        const thisoptions = await options.getOptions(request.params.questionID);
+        const thiselection = await election.getElection(request.params.id);
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/elections");
+        }
+        if (thiselection.running) {
+          request.flash("error", "Cannot edit while election is running");
+          return response.redirect(`/elections/${request.params.id}/`);
+        }
+        if (thiselection.ended) {
+          request.flash("error", "Cannot edit when election has ended");
+          return response.redirect(`/elections/${request.params.id}/`);
+        }
+        if (request.accepts("html")) {
+          response.render("question_page", {
+            title: question.question,
+            description: question.description,
+            id: request.params.id,
+            questionID: request.params.questionID,
+            thisoptions,
+            csrfToken: request.csrfToken(),
+          });
+        } else {
+          return response.json({
+            options,
+          });
         }
       } catch (error) {
         console.log(error);
