@@ -45,6 +45,13 @@ module.exports = (sequelize, DataTypes) => {
         }
       })
     }
+    static getElectionWithId(id) {
+      return this.findOne({
+        where: {
+          id,
+        },
+      });
+    }
   }
   election.init({
     elecName: DataTypes.STRING,

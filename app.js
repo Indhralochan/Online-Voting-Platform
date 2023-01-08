@@ -592,7 +592,7 @@ app.get(
         }
         response.render("newvoter", {
           title: "Add a voter to election",
-          electionID: request.params.electionID,
+          id: request.params.electionID,
           csrfToken: request.csrfToken(),
         });
       } catch (error) {
@@ -600,5 +600,73 @@ app.get(
         return response.status(422).json(error);
       }
     }
+);
+app.post(
+  "/election/:electionID/voters/create",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    console.log(request.body.voterUnqPswd);
+      if (!request.body.voterUnqid) {
+        request.flash("error", "Please enter voterID");
+        return response.redirect(
+          `/election/${request.params.electionID}/voters/create`
+        );
+      }
+      if (!request.body.voterUnqPswd) {
+        request.flash("error", "Please enter password");
+        return response.redirect(
+          `/election/${request.params.electionID}/voters/create`
+        );
+      }
+      if (request.body.voterUnqPswd.length < 8) {
+        request.flash("error", "Password length should be atleast 8");
+        return response.redirect(
+          `/election/${request.params.electionID}/voters/create`
+        );
+      }
+      const hashedPwd = await bcrypt.hash(request.body.voterUnqPswd, saltRounds);
+      try {
+        const thiselection = await election.getElection(request.params.electionID);
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        if (thiselection.Ended) {
+          request.flash("error", "Cannot edit when election has ended");
+          return response.redirect(`/election/${request.params.electionID}/`);
+        }
+        await voter.createVoter({
+          voterUnqid: request.body.voterUnqid,
+          voterUnqPswd: hashedPwd,
+          electionID: request.params.electionID,
+        });
+        return response.redirect(
+          `/election/${request.params.electionID}/voters`
+        );
+      } catch (error) {
+        request.flash("error", "Voter ID already in use");
+        return response.redirect(
+          `/election/${request.params.electionID}/voters/create`
+        );
+      }
+    }
+);
+app.get(
+  "/election/:id/voters",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const votersCount = await voter.countOFVoters(request.params.id);
+    const thisvoters = await voter.getVoters(request.params.id);
+    console.log("yugdywgydgy "+ thisvoters[0]);
+    const thisElection = await election.getElectionWithId(request.params.id);
+    const thisElectionName = thisElection.eleName;
+    return response.render("voters", {
+      votersCount,
+      thisvoters,
+      csrfToken: request.csrfToken(),
+      id: request.params.id,
+      thisElectionName,
+    });
+  }
 );
 module.exports = app;
