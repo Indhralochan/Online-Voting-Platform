@@ -7,7 +7,7 @@ const { AdminCreate,
         options,
         question,
         voter,
-      answers } = require("./models");
+      Answers } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 app.use(express.static(path.join(__dirname, "/public")));
@@ -910,21 +910,20 @@ app.put(
     }
 );
 app.put(
-  "/elections/:electionID/end",
+  "/election/:electionID/end",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    if (request.user.role === "admin") {
       try {
-        const election = await Election.getElection(request.params.electionID);
-        if (request.user.id !== election.adminID) {
+        const thiselection = await election.getElection(request.params.electionID);
+        if (request.user.id !== thiselection.adminID) {
           return response.json({
             error: "Invalid Election ID",
           });
         }
-        if (!election.running) {
-          return response.json("Cannot end when election hasn't launched yet");
+        if (!thiselection.Running) {
+          return response.json("Cannot end the election before election being launched yet");
         }
-        const endElection = await Election.endElection(
+        const endElection = await election.endElection(
           request.params.electionID
         );
         return response.json(endElection);
@@ -932,11 +931,111 @@ app.put(
         console.log(error);
         return response.status(422).json(error);
       }
-    } else if (request.user.role === "voter") {
-      return response.redirect("/");
     }
+);
+app.get("/e/:cstmUrl/voter", async (request, response) => {
+  try {
+    if (request.user) {
+      return response.redirect(`/e/${request.params.cstmUrl}`);
+    }
+    const thiselection = await election.getElectionURL(request.params.cstmUrl);
+    return response.render("voterlogin", {
+      title: "Login in as Voter",
+      cstmUrl: request.params.cstmUrl,
+      electionID: thiselection.id,
+      csrfToken: request.csrfToken(),
+    });
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+app.post(
+  "/e/:cstmUrl/voter",
+  passport.authenticate("Voter", {
+    failureFlash: true,
+    failureRedirect: "back",
+  }),
+  async (request, response) => {
+    return response.redirect(`/e/${request.params.cstmUrl}`);
   }
 );
+app.get("/e/:cstmUrl/", async (request, response) => {
+  if (!request.user) {
+    request.flash("error", "Please login before trying to Vote");
+    return response.redirect(`/e/${request.params.cstmUrl}/voter`);
+  }
+  if (request.user.didVote) {
+    request.flash("error", "You have voted successfully");
+    return response.redirect(`/e/${request.params.cstmUrl}/results`);
+  }
+  try {
+    const thiselection = await election.getElectionURL(request.params.cstmUrl);
+    if (thiselection.Ended) {
+      return response.redirect(`/e/${election.ucstmUrl}/results`);
+    }
+    if (request.user.position === "voter") {
+      if (election.Running) {
+        const thisquestions = await question.getQuestions(election.id);
+        let thisoptions = [];
+        for (let vquestion in thisquestions) {
+          thisoptions.push(await options.getOptions(thisquestions[vquestion].id));
+        }
+        return response.render("vote", {
+          title: thiselection.elecName,
+          electionID: thiselection.id,
+          thisquestions,
+          thisoptions,
+          urlString: request.params.cstmUrl,
+          csrfToken: request.csrfToken(),
+        });
+      } else {
+        return response.render("404");
+      }
+    } else if (request.user.position === "admin") {
+      request.flash("error", "You cannot vote as Admin");
+      request.flash("error", "Please signout as Admin before trying to vote");
+      return response.redirect(`/elections/${election.id}`);
+    }
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
+app.post("/e/:cstmUrl", async (request, response) => {
+  if (!request.user) {
+    request.flash("error", "Please login before trying to Vote");
+    return response.redirect(`/e/${request.params.cstmUrl}/voter`);
+  }
+  if (request.user.didVote) {
+    request.flash("error", "You have voted successfully");
+    return response.redirect(`/e/${request.params.cstmUrl}/results`);
+  }
+  try {
+    let thiselection = await election.getElectionURL(request.params.cstmUrl);
+    if (thiselection.Ended) {
+      request.flash("error", "Cannot vote when election has ended");
+      return response.redirect(`/election/${request.params.id}/results`);
+    }
+    let thisquestions = await question.getQuestions(election.id);
+    for (let vquestion of thisquestions) {
+      let qid = `q-${thisquestions.id}`;
+      let selectedOption = request.body[qid];
+      await Answers.addAnswer({
+        voterID: request.user.id,
+        electionID: thiselection.id,
+        questionID: thisquestions.id,
+        selectedOption: selectedOption,
+      });
+    }
+    await Voter.markAsVoted(request.user.id);
+    return response.redirect(`/e/${request.params.urlString}/results`);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
 
 
 module.exports = app;
