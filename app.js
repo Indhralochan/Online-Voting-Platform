@@ -584,11 +584,11 @@ app.get(
         const thiselection = await election.getElection(request.params.electionID);
         if (request.user.id !== thiselection.adminID) {
           request.flash("error", "Invalid election ID");
-          return response.redirect("/elections");
+          return response.redirect("/election");
         }
         if (thiselection.Ended) {
           request.flash("error", "Cannot edit when election has ended");
-          return response.redirect(`/elections/${request.params.electionID}/`);
+          return response.redirect(`/election/${request.params.electionID}/`);
         }
         response.render("newvoter", {
           title: "Add a voter to election",
@@ -669,4 +669,105 @@ app.get(
     });
   }
 );
+app.get(
+  "/election/:electionID/questions/:questionID/edit",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const thiselection = await election.getElection(request.params.electionID);
+        console.log("asdfasdf");
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        if (thiselection.Running) {
+          request.flash("error", "Cannot edit while election is running");
+          return response.redirect(`/election/${request.params.id}/`);
+        }
+        if (thiselection.Ended) {
+          request.flash("error", "Cannot edit when election has ended");
+          return response.redirect(`/election/${request.params.id}/`);
+        }
+        console.log(request.params.electionID);
+        const thisquestion = await question.gtQuestn(request.params.questionID);
+        return response.render("editquestion", {
+          electionID: request.params.electionID,
+          questionID: request.params.questionID,
+          questionTitle: thisquestion.question,
+          questionDescription: thisquestion.description,
+          csrfToken: request.csrfToken(),
+        });
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+app.put(
+  "/election/:electionID/questions/:questionID/edit",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      if (request.body.question.length < 5) {
+        request.flash("error", "Question length should be atleast 5");
+        return response.json({
+          error: "Question length should be atleast 5",
+        });
+      }
+      try {
+        const thiselection = await election.getElection(request.params.electionID);
+        if (thiselection.Running) {
+          return response.json("Cannot edit while election is running");
+        }
+        if (thiselection.Ended) {
+          return response.json("Cannot edit when election has ended");
+        }
+        if (request.user.id !== thiselection.adminID) {
+          return response.json({
+            error: "Invalid Election ID",
+          });
+        }
+        const updatedQuestion = await question.updateQuestion({
+          elecQuestion: request.body.question,
+          elecDescription: request.body.description,
+          id: request.params.questionID,
+        });
+        return response.json(updatedQuestion);
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+app.delete(
+  "/election/:electionID/questions/:questionID",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const thiselection = await election.getElection(request.params.electionID);
+        if (thiselection.Running) {
+          return response.json("Cannot edit while election is running");
+        }
+        if (thiselection.Ended) {
+          return response.json("Cannot edit when election has ended");
+        }
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        const nofQues = await question.getNumberOfQuestions(
+          request.params.electionID
+        );
+        if (nofQues > 1) {
+          const res = await question.deleteQuestion(request.params.questionID);
+          return response.json({ success: res === 1 });
+        } else {
+          return response.json({ success: false });
+        }
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+
 module.exports = app;
