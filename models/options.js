@@ -17,7 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         order: [["id", "ASC"]],
       });
     }
-
+    static addOption({ option, questionID }) {
+      return this.create({
+        option,
+        questionID,
+      });
+    }
     static gtOptn(id) {
       return this.findOne({
         where: {
