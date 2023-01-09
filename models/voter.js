@@ -25,6 +25,19 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+    static async markAsVoted(id) {
+      return await this.update(
+        {
+          didVote: true,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
     static async createVoter({ voterUnqid, voterUnqPswd, electionID }) {
       return await this.create({
         voterUnqid,
