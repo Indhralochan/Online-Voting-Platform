@@ -243,8 +243,8 @@ app.get(
           request.flash("error", "Invalid election ID");
           return response.redirect("/election");
         }
-        if (thiselection.ended) {
-          return response.redirect(`/election/${election.id}/results`);
+        if (thiselection.Ended) {
+          return response.redirect(`/election/${thiselection.id}/results`);
         }
         const numberOfQuestions = await question.getNumberOfQuestions(
           request.params.id
@@ -1059,6 +1059,8 @@ app.post("/e/:cstmUrl", async (request, response) => {
 app.get("/e/:cstmUrl/results", async (request, response) => {
   response.render("Thankyou");
 });
-
+app.get("/election/:id/results", async (request , response) =>{
+  response.render("thank-you")
+});
 
 module.exports = app;
