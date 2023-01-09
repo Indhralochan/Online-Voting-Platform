@@ -1056,6 +1056,9 @@ app.post("/e/:cstmUrl", async (request, response) => {
     return response.status(422).json(error);
   }
 });
+app.get("/e/:cstmUrl/results", async (request, response) => {
+  response.render("Thankyou");
+});
 
 
 module.exports = app;
