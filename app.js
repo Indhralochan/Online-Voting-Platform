@@ -1010,7 +1010,7 @@ app.get("/e/:cstmUrl/", async (request, response) => {
     }
   } catch (error) {
     console.log(error);
-    return response.status(422).json(error);
+    return response.status(422).json(error); //test
   }
 });
 app.post("/e/:cstmUrl", async (request, response) => {

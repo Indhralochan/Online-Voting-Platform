@@ -1,15 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="./css/style.css">
-    <title><%= title %></title>
 </head>
-<body class="bg-sky-100">
-    <div class="var">
+
+<body class="w-full h-full overflow-hidden flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
+    <div>
+    <div class="flex mx-auto justify-center text-center px-3 "><a href="/"><img src="/images/logo.svg" alt="logo"></a>
+    </div>
+    <div class="mx-auto flex justify-center text-center px-3 font-bold text-3xl text-gray-900">
+        <h1>ONLINE VOTING PLATFORM </h1>
+    </div>
+    <div class="flex w-fit">
+        <div class="flex flex-col md:flex-row md:max-w-full text-gray-900 space-x-4">
+            <img class=" w-full justify-start md:max-w-xl w-fit px-6" src="/images/img.png" alt="image" />
+            <div class="flex flex-col justify-center w-fit space-x-4 text-justify">
+                <h2 class="text-gray-900 mb-2 text-center justify-center text-2xl font-bold">SIMPLE & DEMOCRATIC</h2>
+                <p class="text-gray-900 text-base mb-4 px-12">
+                    Our goal is to make the democratic process more accessible, secure and transparent. With our platform, you can easily register to vote, verify your identity and eligibility, and cast your vote from the comfort of your own home. Our platform uses advanced security measures to ensure the integrity and accuracy of the voting process.</p>
+                <h3 class="text-gray-900 text-xl font-medium mb-2 text-center justify-center">Every vote counts! Log in and have your say.</h3>
+                <div class="flex flex-row justify-center text-center">
+                    <p class="py-1 px-3 justify-center text-center"><a class="text-gray-900 bg-green-500 rounded-lg shadow-lg px-3" href="/signup">Sign-up</a></p>
+                    <p class="py-1 px-3 justify-center text-center"><a class="text-gray-900 bg-green-500 rounded-lg shadow-lg px-3" href="/login">Sign-in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="flex flex-row">
+        <div class=""></div><img src="/images/img.png" alt="logo"></div>
+        <div class="flex flex-col">
+            <div class=""><h2>SIMPLE & DEMOCRATIC</h2></div>
+            <div class=""><p>This voting website is useful for anyone who wants to make their voice heard in the democratic process.</p></div>
+            <div class=""><h3>Every vote counts! Log in and have your say.</h3></div>
+            <div class="flex flex-row">
+            <p class="py-1">New here? <a class="text-blue-600" href="/signup">Sign-up</a></p>
+            <p class="py-1">Already have an account? <a class="text-blue-600" href="/login">Sign-in</a></p>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="var">
         <div class="grid grid-cols-9 grid-rows-6">
             <div class="col-start-4 col-span-3 row-start-2 text-lg">
                 <div><h1 class="flex text-center justify-center text-3xl my-4 px-3 py-3 font-semibold text-gray-900">Online Voting Platform</h1></div>
@@ -17,6 +51,14 @@
             <p class="py-1">Already have an account? <a class="text-blue-600" href="/login">Sign-in</a></p>
         </div>
     </div>
+</div> -->
+<footer class="text-center lg:text-left mt-24 py-0 text-end justify-end">
+    <div class="text-gray-700 text-center justify-end" style="background-color: rgba(0, 0, 0, 0.2);">
+      © 2023 Copyright:
+      <a class="text-gray-800" href="https://github.com/Indhralochan">Indhra Lochan Kumar</a>
+    </div>
+  </footer>
+</div>
 </div>
 </body>
 </html>
