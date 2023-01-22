@@ -265,7 +265,7 @@ app.get(
         const thiselection = await election.getElection(request.params.id);
         if (request.user.id!==thiselection.adminID) {
           request.flash("error", "Invalid election ID");
-          return response.redirect("/elections");
+          return response.redirect("/election");
         }
         const thisquestions = await question.gtQuestns(request.params.id);
         if (!thiselection.Running && !thiselection.Ended) {
@@ -1023,6 +1023,7 @@ app.post("/e/:cstmUrl", async (request, response) => {
     return response.redirect(`/e/${request.params.cstmUrl}/results`);
   }
   try {
+    console.log("asdfasdfasdfasd");
     let thiselection = await election.getElectionURL(request.params.cstmUrl);
     if (thiselection.Ended) {
       request.flash("error", "Cannot vote when election has ended");
@@ -1047,7 +1048,60 @@ app.post("/e/:cstmUrl", async (request, response) => {
   }
 });
 app.get("/e/:cstmUrl/results", async (request, response) => {
-  response.render("Thankyou");
+  try {
+    const thiselection = await election.getElectionwithUrl(
+      request.params.cstmUrl
+    );
+    if (!thiselection.Running && !thiselection.Ended) {
+      return response.status(404).render("error");
+    }
+    if (!thiselection.Ended && request.user.position === "voter") {
+      return response.render("Thankyou");
+    }
+    const thisquestions = await question.gtQuestns(thiselection.id);
+    const thisanswers = await Answers.gtanswers(thiselection.id);
+    let thisoptions = [];
+    let optionLabels = [];
+    let optionsCount = [];
+    let winners = [];
+    for (let questions in thisquestions) {
+      let vals = await options.gtOptns(thisquestions[questions].id);
+      thisoptions.push(vals);
+      let vals_count = [];
+      let vals_labels = [];
+      for (let opt in vals) {
+        vals_labels.push(vals[opt].option);
+        vals_count.push(
+          await Answers.gtOptnCount({
+            electionID: thiselection.id,
+            OptionBool: vals[opt].id,
+            questionID: thisquestions[questions].id,
+          })
+        );
+      }
+      winners.push(Math.max.apply(Math, vals_count));
+      optionLabels.push(vals_labels);
+      optionsCount.push(vals_count);
+    }
+    const noofVoted = await voter.countVoted(election.id);
+    const nNotVoted = await voter.Pending(election.id);
+    const totalVoters = noofVoted + nNotVoted;
+    return response.render("results", {
+      elecName: election.electionName,
+      thisanswers,
+      thisquestions,
+      thisoptions,
+      optionsCount,
+      optionLabels,
+      winners,
+      noofVoted,
+      nNotVoted,
+      totalVoters,
+    });
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
 });
 app.get("/election/:id/results", async (request , response) =>{
   response.render("thank-you")

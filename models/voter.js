@@ -45,6 +45,14 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+    static async Pending(electionID) {
+      return await this.count({
+        where: {
+          electionID,
+          didVote: false,
+        },
+      });
+    }
     static async createVoter({ voterUnqid, voterUnqPswd, electionID }) {
       return await this.create({
         voterUnqid,
