@@ -35,13 +35,13 @@
                     <% for (let i=0; i<elections.length; i++) { %>
                         <li class="text-center justify-center">
                             <div class="flex items-center w-fit my-2 px-2 py-1 rounded ">
-                                <a href="/election/<%= elections[i].id %>" class="text-black bg-stone-200 text-center rounded w-fit px-2 py-1 hover:bg-green-200 justify-center mx-auto text-center"><%= i+1 %>.<%= elections[i].elecName %></a>
+                                <a href="/election/<%= elections[i].id %>" class="text-black bg-green-200  text-center rounded w-fit px-2 py-1 hover:bg-green-400 justify-center mx-auto text-center"><%= i+1 %>.<%= elections[i].elecName %></a>
                             </div>
                         </li>
                     <% } %>
                 </ol>
                 <div class="py-5">
-                <div class="bg-orange-400 text-center rounded  w-fit px-2 py-1 hover:bg-blue-600 justify-center mx-auto text-center">
+                <div class="bg-teal-600 bg-opacity-60 text-center rounded  w-fit px-2 py-1 hover:bg-emerald-600 justify-center mx-auto text-center">
                     <a href="/election/createNew" class="text-white">Create a new elections</a>
                 </div>
             </div>

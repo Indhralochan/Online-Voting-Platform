@@ -25,16 +25,11 @@
         }
     </script>
 </head>
-<body class="w-full h-full overflow-hidden flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
+<body class="w-full h-full flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
     <div class="text-center justify-center"><%- include('header.ejs') %></div>
         <div class="w-full">
             <div class="flex justify-between">
-                <span class="text-4xl font-light "><%= title %></span>
-                <div class="flex">
-                    <div class="bg-purple-100 border border-purple-700 text-orange-400 rounded w-fit px-4 pt-2 hover:text-white hover:bg-blue-600 mx-2">
-                        <a href="/election/<%= electionID %>/">Edit election</a>
-                    </div>
-                </div>
+                <span class="mx-auto text-4xl font-semibold justify-center "><%= title %></span>
             </div>
             <div>
                 <% if (messages && messages.error && messages.error.length > 0) { %>
@@ -43,7 +38,7 @@
                     <% } %>
                 <% } %>
             </div>
-            <div class="mt-4 bg-gray-200 shadow-md rounded-lg text-left">
+            <div class="mt-4 bg-gray-50 bg-opacity-80 shadow-md rounded-lg text-left">
                 <form action="/e/<%=cstmUrl%>" method="post">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="py-2 px-8">
@@ -51,8 +46,8 @@
                         <% for(let i=0; i<thisquestions.length; i++) { %>
                             <li class="my-2">
                                 <div class="px-2 py-1">
-                                    <h3 class="text-2xl my-2"><%= thisquestions[i].elecQuestion %></h3>
-                                    <p class="text-black-600 text-md my-2"><%= thisquestions[i].elecDescription %></p>
+                                    <h3 class="text-2xl my-2 justify-center"><%= thisquestions[i].elecQuestion %></h3>
+                                    <p class="text-black-600 text-md my-2 justify-center"><%= thisquestions[i].elecDescription %></p>
                                 </div>
                                 <div class="ml-8">
                                     <ol class="list-none">
@@ -69,11 +64,13 @@
                         <% } %>
                     </ol>
                 </div>
-                <button type="submit" class=" py-3 text-center justify-center mx-auto flex text-white bg-orange-400 rounded w-fit px-4 hover:bg-blue-600 ml-2 ">
-                    Submit
-                 </button>
                 </form>
             </div>
+        </div>
+        <div class="flex justify-center">
+        <button type="submit" class="flex py-3 text-center justify-center mx-auto flex text-white bg-teal-600 rounded w-fit px-4 hover:bg-emerald-600 ml-2 ">
+            Submit
+         </button>
         </div>
         </div>
     </div>

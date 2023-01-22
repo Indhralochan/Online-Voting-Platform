@@ -9,30 +9,35 @@
     <meta name="csrf-token" content="<%=csrfToken%>">
 </head>
 <body class="w-full h-full overflow-hidden flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
-    <h1 class="mx-auto justify-center text-center text-black-800 text-3xl py-3">Online Voting platform</h1>
-    <div class="relative flex min-h-screen text-gray-900 flex-col justify-center overflow-hidden py-6 sm:py-12">
-        <div class="relative py-3 sm:w-auto mx-auto text-center">
-            <span class="text-2xl font-light px-8 ">Create a new Account</span>
-            <div>
+    <div>
+        <div class="flex mx-auto justify-center text-center px-3 "><a href="/"><img src="/images/logo.svg" alt="logo"></a>
+    </div>
+    <div  class="relative flex  text-gray-900 flex-col justify-center overflow-hidden py-0 sm:py-0">
+        <div class="relative py-2 sm:w-auto mx-auto text-center">
+            <span class="text-2xl font-semibold px-8 ">Create a new Account</span>
+            <div class="flex justify-center">
                 <% if (messages && messages.error && messages.error.length > 0) { %>
                     <% for(var i=0; i<messages.error.length; i++) { %>
                         <p class="bg-green-100 my-3 list-none rounded-md px-4 py-2"><%= messages.error[i] %></p>
                     <% } %>
                 <% } %>
             </div>
-            <div class="mt-4 bg-white shadow-md rounded-lg text-left">
+            <div class="mt-4 bg-gray-50 bg-opacity-80 shadow-md rounded-lg text-left">
                 <form action="/admin" method="post" class="px-8 py-6">
                     <input type="hidden" name="_csrf" value="<%=csrfToken%>" />
                     <label for="firstName" class="block mt-3 font-semibold">First name</label>
-                    <input id="firstName" name="firstName" type="text" placeholder="First name" class="border w-full h-5 px-3 py-5 mt-2 rounded-md" required>
+                    <input id="firstName" name="firstName" type="text" placeholder="First name" class="border w-full h-5 px-3 py-5 mt-2 rounded-md bg-gray-50 bg-opacity-80" required>
                     <label for="lastName" class="block mt-3 font-semibold">Last name</label>
-                    <input id="lastName" name="lastName" type="text" placeholder="Last name" class="border w-full h-5 px-3 py-5 mt-2 " required>
+                    <input id="lastName" name="lastName" type="text" placeholder="Last name" class="border w-full h-5 px-3 py-5 mt-2 bg-gray-50 bg-opacity-80 " required>
                     <label for="email" class="block mt-3 font-semibold">Email</label>
-                    <input id="email" name="email" type="email" placeholder="Email" class="border w-full h-5 px-3 py-5 mt-2" required>
+                    <input id="email" name="email" type="email" placeholder="Email" class="border w-full h-5 px-3 py-5 mt-2 bg-gray-50 bg-opacity-80" required>
                     <label for="password" class="block mt-3 font-semibold">Password</label>
-                    <input id="password" name="password" type="password" placeholder="Password" class="border w-full h-5 px-3 py-5 mt-2" required>
+                    <input id="password" name="password" type="password" placeholder="Password" class="border w-full h-5 px-3 py-5 mt-2 bg-gray-50 bg-opacity-80" required>
                     <button type="submit" class="mt-6 bg-green-600 w-full text-white py-2 px-6 rounded-md hover:bg-blue-800 ">Create account</button>
                 </form>
+            </div>
+            <div class="mt-4">
+                <p>have an account?</p><a href="/login" class="text-sm hover:text-blue-900">Login</a>
             </div>
         </div>
     </div>

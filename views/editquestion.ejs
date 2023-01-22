@@ -31,14 +31,14 @@
     </script>
 </head>
 <body class="w-full h-full overflow-hidden flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
-    <div class="flex mx-auto text-center justify-center"><%- include('header.ejs') %></div>
+    <div class="text-center justify-center"><%- include('header.ejs') %></div>
     <div class="flex gap-1 mx-10 mt-6">
         <span>></span>
-        <a href="/election" class="text-black-800 hover:text-purple-600">All Elections</a>
+        <a href="/election" class="text-black-900 text-emerald-900">All Elections</a>
         <span>></span>
-        <a href="/election/<%= electionID %>/" class="text-black-800 hover:text-purple-600">Election</a>
+        <a href="/election/<%= electionID %>/" class="text-black-900 text-emerald-900">Election</a>
         <span>></span>
-        <a href="/election/<%= electionID %>/questions" class="text-black-800 hover:text-purple-600">Questions</a>
+        <a href="/election/<%= electionID %>/questions" class="text-black-900 text-emerald-900">Questions</a>
     </div>
     <div class=" flex text-gray-800 antialiased flex-col overflow-hidden py-6 sm:py-12">
         <div class=" py-3 sm:w-96 mx-auto text-center">
@@ -50,14 +50,14 @@
                     <% } %>
                 <% } %>
             </div>
-            <div class="mt-4 bg-white shadow-md rounded-lg text-left bg-gray-50">
+            <div class="mt-4 bg-gray-50 bg-opacity-80 shadow-md rounded-lg text-left ">
                 <div class="px-8 py-6">
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                     <label for="question" class="block mt-3 font-semibold">Question</label>
-                    <input value="<%= questionTitle %>" id="question" name="question" type="text" placeholder="Question" class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md" required>
+                    <input value="<%= questionTitle %>" id="question" name="question" type="text" placeholder="Question" class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md bg-gray-50 bg-opacity-80" required>
                     <label for="description" class="block mt-3 font-semibold">Description</label>
-                    <textarea id="description" name="description" class="border w-full px-2 py-1 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md" placeholder="Description" rows="4" cols="20"><%= questionDescription %></textarea>
-                    <button class="mt-6 w-full bg-orange-400 text-white py-2 px-6 rounded-md hover:bg-green-500 " onclick="updateQuestion()">Update question</button>
+                    <textarea id="description" name="description" class="border w-full px-2 py-1 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md bg-gray-50 bg-opacity-80" placeholder="Description" rows="4" cols="20"><%= questionDescription %></textarea>
+                    <button class="mt-6 w-full bg-teal-600 text-white py-2 px-6 rounded-md hover:bg-emerald-600 " onclick="updateQuestion()">Update question</button>
                 </div>
             </div>
         </div>
