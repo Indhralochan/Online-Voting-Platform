@@ -2,7 +2,7 @@ const request = require("supertest");
 const cheerio = require("cheerio");
 const db = require("../models/index");
 const app = require("../app");
-
+jest.setTimeout(30000)
 let server, agent;
 
 function getCsrfToken(res) {

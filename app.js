@@ -1023,22 +1023,24 @@ app.post("/e/:cstmUrl", async (request, response) => {
     return response.redirect(`/e/${request.params.cstmUrl}/results`);
   }
   try {
-    console.log("asdfasdfasdfasd");
     let thiselection = await election.getElectionURL(request.params.cstmUrl);
     if (thiselection.Ended) {
       request.flash("error", "Cannot vote when election has ended");
       return response.redirect(`/election/${request.params.id}/results`);
     }
     let thisquestions = await question.gtQuestns(thiselection.id);
+    console.log(thisquestions + "this questions console log\n\n\n\n\n")
     for (let vquestion of thisquestions) {
+      console.log(vquestion)
       let qid = `q-${vquestion.id}`;
       let selectedOption = request.body[qid];
-      await Answers.addAnswer({
+      let addedAnswer = await Answers.addAnswer({
         voterID: request.user.id,
         electionID: thiselection.id,
-        questionID: thisquestions.id,
+        questionID: vquestion.id,
         OptionBool: selectedOption,
       });
+      // console.log(addedAnswer.OptionBool + "uieghuihwuih3ui")
     }
     await voter.markAsVoted(request.user.id);
     return response.redirect(`/e/${request.params.cstmUrl}/results`);
@@ -1069,11 +1071,12 @@ app.get("/e/:cstmUrl/results", async (request, response) => {
       thisoptions.push(vals);
       let vals_count = [];
       let vals_labels = [];
+      let electionid=thiselection.id
       for (let opt in vals) {
         vals_labels.push(vals[opt].option);
         vals_count.push(
           await Answers.gtOptnCount({
-            electionID: thiselection.id,
+            electionID: electionid,
             OptionBool: vals[opt].id,
             questionID: thisquestions[questions].id,
           })
@@ -1083,11 +1086,11 @@ app.get("/e/:cstmUrl/results", async (request, response) => {
       optionLabels.push(vals_labels);
       optionsCount.push(vals_count);
     }
-    const noofVoted = await voter.countVoted(election.id);
-    const nNotVoted = await voter.Pending(election.id);
+    const noofVoted = await voter.countVoted(thiselection.id);
+    const nNotVoted = await voter.Pending(thiselection.id);
     const totalVoters = noofVoted + nNotVoted;
     return response.render("results", {
-      elecName: election.electionName,
+      elecName: thiselection.elecName,
       thisanswers,
       thisquestions,
       thisoptions,
@@ -1103,8 +1106,169 @@ app.get("/e/:cstmUrl/results", async (request, response) => {
     return response.status(422).json(error);
   }
 });
-app.get("/election/:id/results", async (request , response) =>{
-  response.render("thank-you")
+
+app.get("/election/:id/results", async (request, response) => {
+  try {
+    console.log(request.params.id+"kajjfljasdlfk")
+    const thiselection = await election.findOne({where: {
+      id:request.params.id
+    }})
+    if (!thiselection.Running && !thiselection.Ended) {
+      console.log("error here 1")
+      return response.status(404).render("error");
+    }
+    if (!thiselection.Ended && request.user.position === "voter") {
+      console.log("error here 2")
+      return response.render("Thankyou");
+    }
+    const thisquestions = await question.gtQuestns(thiselection.id);
+    const thisanswers = await Answers.gtanswers(thiselection.id);
+    let thisoptions = [];
+    let optionLabels = [];
+    let optionsCount = [];
+    let winners = [];
+    for (let questions in thisquestions) {
+      let vals = await options.gtOptns(thisquestions[questions].id);
+      thisoptions.push(vals);
+      let vals_count = [];
+      let vals_labels = [];
+      let electionid=thiselection.id
+      for (let opt in vals) {
+        vals_labels.push(vals[opt].option);
+        vals_count.push(
+          await Answers.gtOptnCount({
+            electionID: electionid,
+            OptionBool: vals[opt].id,
+            questionID: thisquestions[questions].id,
+          })
+        );
+      }
+      winners.push(Math.max.apply(Math, vals_count));
+      optionLabels.push(vals_labels);
+      optionsCount.push(vals_count);
+    }
+    const noofVoted = await voter.countVoted(thiselection.id);
+    const nNotVoted = await voter.Pending(thiselection.id);
+    const totalVoters = noofVoted + nNotVoted;
+    return response.render("results", {
+      elecName: thiselection.elecName,
+      thisanswers,
+      thisquestions,
+      thisoptions,
+      optionsCount,
+      optionLabels,
+      winners,
+      noofVoted,
+      nNotVoted,
+      totalVoters,
+    });
+  } catch (error) {
+    console.log(error);
+    console.log("error here 3")
+
+    return response.status(422).json(error);
+  }
 });
 
+app.get(
+  "/election/:electionID/edit",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        const thiselection = await election.getElection(request.params.electionID);
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        if (thiselection.Running) {
+          request.flash("error", "Cannot edit while election is running");
+          return response.redirect(`/election/${request.params.electionID}/`);
+        }
+        if (thiselection.Ended) {
+          request.flash("error", "Cannot edit when election has ended");
+          return response.redirect(`/election/${request.params.electionID}/`);
+        }
+        return response.render("editelection", {
+          electionID: request.params.electionID,
+          csrfToken: request.csrfToken(),
+        });
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
+
+app.put(
+  "/election/:electionID/edit",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    // if (request.user.position === "admin") {
+      if (request.body.elecName.length < 5) {
+        request.flash("error", "Election name length should be atleast 5");
+        return response.redirect(
+          `/election/${request.params.electionID}/edit`
+        );
+      }
+      if (request.body.cstmUrl.length < 3) {
+        request.flash("error", "URL String length should be atleast 3 characters");
+        return response.redirect(
+          `/election/${request.params.electionID}/edit`
+        );
+      }
+      try {
+        const thiselection = await election.getElectionWithId(request.params.electionID);
+        console.log(thiselection)
+        if (thiselection.Running) {
+          return response.json("Cannot edit while election is running");
+        }
+        if (thiselection.Ended) {
+          return response.json("Cannot edit when election has ended");
+        }
+        if (request.user.id !== thiselection.adminID) {
+          return response.json({
+            error: "Invalid Election ID",
+          });
+        }
+        console.log("update try \n\n\n\n\n")
+        // await thiselection.updatecstmUrl(request.body.urlString)
+        // await thiselection.updateElecName(request.body.electionName)
+        // const updatedElection = await election.updateElection({
+        //   electionName: request.body.electionName,
+        //   urlString: request.body.urlString,
+        //   id: request.params.electionID,
+        // });
+        return response.json(updatedElection);
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    // } else if (request.user.role === "voter") {
+      return response.redirect("/");
+    }
+  // }
+);
+
+app.delete(
+  "/election/:electionID",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+      try {
+        console.log("testing\n\n\n\n")
+        const thiselection = await election.getElection(request.params.electionID);
+        if (thiselection.Running) {
+          return response.json("Cannot delete while election is running");
+        }
+        if (request.user.id !== thiselection.adminID) {
+          request.flash("error", "Invalid election ID");
+          return response.redirect("/election");
+        }
+        const res = await election.deleteElection(request.params.electionID);
+        return response.json({ success: res === 1 });
+      } catch (error) {
+        console.log(error);
+        return response.status(422).json(error);
+      }
+    }
+);
 module.exports = app;

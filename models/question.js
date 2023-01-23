@@ -16,9 +16,11 @@ module.exports = (sequelize, DataTypes) => {
       });
       question.hasMany(models.options, {
         foreignKey: "questionID",
+        onDelete:"CASCADE"
       });
       question.hasMany(models.Answers, {
         foreignKey: "questionID",
+        onDelete:"CASCADE"
       });
     }
     static async getNumberOfQuestions(electionID) {

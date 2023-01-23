@@ -31,7 +31,7 @@
             <div class="flex justify-between">
                 <span class="text-4xl font-semibold mx-auto "><%= title %></span>
                 <div class="flex">
-                    <div class="bg-purple-100 border border-purple-700 text-orange-400 rounded w-fit px-4 pt-2 hover:text-white hover:bg-blue-600 mx-2">
+                    <div class="bg-emerald-600 border border-purple-700 t rounded w-fit px-4 pt-2 hover:text-white hover:bg-teal-600 mx-2">
                         <a href="/election/<%= electionID %>/">Edit election</a>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
             <div>
                 <% if (messages && messages.error && messages.error.length > 0) { %>
                     <% for(var i=0; i<messages.error.length; i++) { %>
-                        <p class="bg-purple-100 my-3 list-none rounded-md px-4 py-2"><%= messages.error[i] %></p>
+                        <p class="bg-green-200 my-3 list-none rounded-md px-4 py-2"><%= messages.error[i] %></p>
                     <% } %>
                 <% } %>
             </div>
@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="justify-center text-center mx-auto flex py-3">
-            <button onclick="launchElection()" class=" py-3 text-center justify-center mx-auto flex text-white bg-orange-400 rounded w-fit px-4 hover:bg-blue-600 ml-2 ">
+            <button onclick="launchElection()" class="flex py-3 text-center justify-center mx-auto flex text-white bg-teal-600 rounded w-fit px-4 hover:bg-emerald-600 ml-2 ">
                 Launch election
             </button>
         </div>

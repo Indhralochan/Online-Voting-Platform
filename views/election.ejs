@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <title><%= title %></title>
 </head>
-<body class="w-full h-full overflow-hidden flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
+<body class="w-full h-full  flex min-h-screen flex-col" style="background-image: url(/images/blurry-gradient-haikei.svg);">
     <div class="justify-center text-center"><%- include('header.ejs') %></div>
     <h3 class="text-2xl px-3 py-2 left flex text-center justify-center">Hello, <%= username %></h3>
     <br>
@@ -30,7 +30,7 @@
         </div>
         <div class="flex flex-col text-center justify-center">
             <div class="mx-4 flex flex-col justify-center text-center">  
-                <p class="text-orange-400 mx-auto text-center"><%= (elections.length==0)?"You have not created any electionss yet":"" %></p>
+                <p class="text-black-800 mx-auto text-center"><%= (elections.length==0)?"You have not created any elections yet":"" %></p>
                 <ol class="flex flex-col justify-center mx-auto text-center">
                     <% for (let i=0; i<elections.length; i++) { %>
                         <li class="text-center justify-center">
@@ -38,7 +38,8 @@
                                 <a href="/election/<%= elections[i].id %>" class="text-black bg-green-200  text-center rounded w-fit px-2 py-1 hover:bg-green-400 justify-center mx-auto text-center"><%= i+1 %>.<%= elections[i].elecName %></a>
                             </div>
                         </li>
-                    <% } %>
+                        
+                        <% } %>
                 </ol>
                 <div class="py-5">
                 <div class="bg-teal-600 bg-opacity-60 text-center rounded  w-fit px-2 py-1 hover:bg-emerald-600 justify-center mx-auto text-center">

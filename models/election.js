@@ -12,16 +12,19 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       election.belongsTo(models.AdminCreate,{
-        foreignKey:"adminID"
+        foreignKey:"adminID",
       });
       election.hasMany(models.question, {
         foreignKey: "electionID",
+        onDelete:"CASCADE"
       });
       election.hasMany(models.voter, {
         foreignKey: "electionID",
+        onDelete:"CASCADE"
       });
       election.hasMany(models.Answers, {
         foreignKey: "electionID",
+        onDelete:"CASCADE"
       });
     }
     static launchElection(id) {
@@ -37,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
+    static deleteElection(id) {
+      return this.destroy({
+        where: {
+          id,
+        },
+      });
+    }
+
     static endElection(id) {
       return this.update(
         {
@@ -79,6 +90,20 @@ module.exports = (sequelize, DataTypes) => {
         },
         order: [["id", "ASC"]],
       });
+    }
+    static updateElection({ cstmUrl, elecName, id }) {
+      return this.update(
+        {
+          cstmUrl,
+          elecName,
+        },
+        {
+          returning: true,
+          where: {
+            id,
+          },
+        }
+      );
     }
     static async getElection(id){
       return this.findOne({

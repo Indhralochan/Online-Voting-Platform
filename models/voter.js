@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       voter.hasMany(models.Answers, {
         foreignKey: "voterID",
+        onDelete:"CASCADE"
       });
     }
     static async getNumberOfVoters(electionID) {

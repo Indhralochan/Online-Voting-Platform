@@ -11,12 +11,10 @@ module.exports = {
       },
       voterUnqid: {
         type: Sequelize.STRING,
-        unique:true,
         allowNull:false
       },
       voterUnqPswd: {
         type: Sequelize.STRING,
-        unique:true,
         allowNull:false
       },
       didVote: {

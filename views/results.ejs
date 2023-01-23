@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let ctx = null;
+        let ml = null;
         let optionsL = null;
         let optionsCount = null;
     </script>
@@ -17,10 +17,10 @@
     </title>
 </head>
 
-<body class="w-full h-full overflow-hidden flex min-h-screen flex-col"
+<body class="w-full h-full  flex min-h-screen flex-col"
     style="background-image: url(/images/blurry-gradient-haikei.svg);">
     <%- include('header.ejs') %>
-        <div class=" flex  text-black flex-col  overflow-hidden py-6 sm:py-12 px-20">
+        <div class=" flex  text-black flex-col  py-6 sm:py-12 px-20">
             <div class="w-full">
                 <div>
                     <% if (messages && messages.error && messages.error.length> 0) { %>
@@ -31,11 +31,11 @@
                             <% } %>
                                 <% } %>
                 </div>
-                <div class="flex flex-col gap-6 divide-y-2 divide-black">
+                <div class="flex flex-col gap-6 divide-y-2 divide-black justify-center">
                     <span class="text-5xl font-light mb-8">
-                        Results Of Election: " <%= elecName %> "
+                        Results Of Election: <%= elecName %>
                     </span>
-                    <div class="py-3 justify-between">
+                    <div class=" flex py-3 justify-center">
                         <div class="flex flex-col justify-evenly">
                             <span class="text-4xl font-bold text-black-200">Voters Participation in The Election:</span>
                             <div class="flex flex-col text-black-400">
@@ -44,17 +44,17 @@
                                 <span class="text-3xl ">No Of Pending Voters: <%= nNotVoted %></span>
                             </div>
                         </div>
-                        <div class="w-full flex mt-6">
+                        <div class="w-full flex mt-6 justify-center">
                             <span class="text-3xl ">Pie Chart:</span>
                             <div class="w-60">
                                 <canvas class="object-contain" id="votes"></canvas>
                             </div>
                         </div>
                         <script>
-                            ctx = document.getElementById('votes');
+                            ml = document.getElementById('votes');
                             completed = "<%= noofVoted %>";
                             pending = "<%= nNotVoted %>";
-                            new Chart(ctx, {
+                            new Chart(ml, {
                                 type: 'pie',
                                 data: {
                                     labels: ["Completed ", "Pending "],
@@ -98,7 +98,7 @@
                                         </div>
                                         <div class="ml-12 mt-6">
                                             <ol class="list-none">
-                                                <% for(let j=0; j<options[i].length; j++) { %>
+                                                <% for(let j=0; j<thisoptions[i].length; j++) { %>
                                                     <li
                                                         class="option-item my-2 text-2xl grid grid-cols-10 text-black items-center">
                                                         <% if (optionsCount[i][j]===winners[i]) {%>
@@ -113,7 +113,7 @@
                                                                 <label
                                                                     class=" col-start-2 col-span-4 text-xl text-black-400"><span
                                                                         class="text-black">
-                                                                        <%= options[i][j].option %>
+                                                                        <%= thisoptions[i][j].option %>
                                                                     </span> got <span class="text-black">
                                                                         <%= optionsCount[i][j] %>
                                                                     </span> votes</label>
@@ -127,10 +127,10 @@
                                     </div>
                                 </div>
                                 <script>
-                                    ctx = document.getElementById('Chart-<%= i %>');
+                                    ml = document.getElementById('Chart-<%= i %>');
                                     optionsCount = "<%= optionsCount[i] %>".split(",");
                                     optionsL = "<%= optionLabels[i] %>".split(",");
-                                    new Chart(ctx, {
+                                    new Chart(ml, {
                                         type: 'bar',
                                         data: {
                                             labels: optionsL,
